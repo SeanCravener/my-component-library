@@ -1,62 +1,53 @@
 import React from "react";
-import { Pressable, StyleSheet, View, ViewProps } from "react-native";
+import {
+  GestureResponderEvent,
+  StyleProp,
+  TouchableOpacity,
+  ViewStyle,
+} from "react-native";
 import { useTheme } from "../../../hooks/useTheme";
-import { Theme } from "../../../theme/theme";
+import { View } from "../index";
 
-interface CardProps extends ViewProps {
-  onPress?: () => void;
-  elevation?: boolean;
-  padding?: keyof Theme["spacing"];
+type ElevationKey = keyof ReturnType<typeof useTheme>["theme"]["elevation"];
+type RadiusKey = keyof ReturnType<typeof useTheme>["theme"]["borderRadius"];
+type SpacingKey = keyof ReturnType<typeof useTheme>["theme"]["spacing"];
+type ColorKey = keyof ReturnType<typeof useTheme>["theme"]["colors"];
+
+interface CardProps {
+  children: React.ReactNode;
+  padding?: SpacingKey;
+  radius?: RadiusKey;
+  elevation?: ElevationKey;
+  backgroundColor?: ColorKey;
+  style?: StyleProp<ViewStyle>;
+  onPress?: (event: GestureResponderEvent) => void;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
-  onPress,
-  elevation = true,
   padding = "md",
+  radius = "lg",
+  elevation = "level1",
+  backgroundColor = "surfaceContainerLow",
   style,
-  ...props
+  onPress,
 }) => {
   const { theme } = useTheme();
 
-  const styles = StyleSheet.create({
-    card: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing[padding],
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      ...(elevation && {
-        shadowColor: theme.colors.text.primary,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
-      }),
-    },
-  });
+  const innerStyle: ViewStyle = {
+    borderRadius: theme.borderRadius[radius],
+    backgroundColor: theme.colors[backgroundColor],
+    padding: theme.spacing[padding],
+    ...(elevation ? theme.elevation[elevation] : {}),
+  };
 
   if (onPress) {
     return (
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.card,
-          {
-            opacity: pressed ? 0.9 : 1,
-          },
-          style,
-        ]}
-        {...props}
-      >
-        {children}
-      </Pressable>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={[style]}>
+        <View style={[innerStyle]}>{children}</View>
+      </TouchableOpacity>
     );
   }
 
-  return (
-    <View style={[styles.card, style]} {...props}>
-      {children}
-    </View>
-  );
+  return <View style={[innerStyle, style]}>{children}</View>;
 };

@@ -1,58 +1,144 @@
-import React from "react";
+import React, { useState } from "react";
+import { ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Avatar,
   Badge,
   Button,
+  Card,
+  Checkbox,
   Error,
-  Form,
-  FormField,
-  Header,
+  Icon,
+  Image,
   Input,
+  ListItem,
   Loading,
   Modal,
   Text,
+  Toggle,
   View,
 } from "../components/ui";
 
+const reactLogo = require("../assets/images/react-logo.png");
+
 export default function ExampleScreen() {
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [modalVisible, setModalVisible] = React.useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   return (
-    <View>
-      <Header
-        title="Example"
-        leftElement={<Avatar size={32} initials="JD" />}
-        rightElement={<Badge label="New" variant="primary" />}
-      />
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ padding: 24 }}>
+        <View
+          padding="xl"
+          backgroundColor="surfaceContainer"
+          style={{ flex: 1 }}
+        >
+          <Text
+            variant="headline"
+            fontWeight="bold"
+            style={{ marginBottom: 24 }}
+          >
+            All Components
+          </Text>
 
-      {loading ? (
-        <Loading text="Please wait..." />
-      ) : error ? (
-        <Error message={error} onRetry={() => setError(null)} />
-      ) : (
-        <Form>
-          <FormField label="Email">
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Button & Input
+            </Text>
             <Input
-              placeholder="Enter your email"
-              keyboardType="email-address"
+              label="Email"
+              value={inputValue}
+              onChangeText={setInputValue}
+              placeholder="test@example.com"
+              style={{ marginBottom: 12 }}
             />
-          </FormField>
-          <FormField label="Password">
-            <Input placeholder="Enter your password" secureTextEntry />
-          </FormField>
-          <Button title="Show Modal" onPress={() => setModalVisible(true)} />
-        </Form>
-      )}
+            <Button title="Submit" onPress={() => {}} />
+          </Card>
 
-      <Modal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        title="Example Modal"
-      >
-        <Text>This is a modal dialog</Text>
-      </Modal>
-    </View>
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Badge, Avatar & Icon
+            </Text>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+            >
+              <Badge label="New" variant="success" />
+              <Avatar label="JD" />
+              <Icon name="check-circle" color="primary" />
+            </View>
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Error & Loading
+            </Text>
+            <Error
+              title="Oops!"
+              message="Something went wrong."
+              style={{ marginBottom: 12 }}
+            />
+            <Loading />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Image & Modal
+            </Text>
+            <Image
+              source={reactLogo}
+              style={{ width: 80, height: 80, marginBottom: 12 }}
+            />
+            <Button title="Open Modal" onPress={() => setModalVisible(true)} />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              ListItem
+            </Text>
+            <ListItem
+              title="Account"
+              subtitle="Manage your account"
+              icon="user"
+            />
+            <ListItem title="Security" icon="lock" />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Toggle
+            </Text>
+            <Toggle
+              label="Enable Notifications"
+              value={notificationsEnabled}
+              onValueChange={setNotificationsEnabled}
+              color="secondary"
+            />
+          </Card>
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Checkbox
+            </Text>
+            <Checkbox
+              checked={termsAccepted}
+              onChange={setTermsAccepted}
+              label="Accept Terms & Conditions"
+              color="tertiary"
+            />
+          </Card>
+        </View>
+
+        <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
+          <Text variant="title" fontWeight="bold" style={{ marginBottom: 12 }}>
+            Modal Content
+          </Text>
+          <Text variant="body" style={{ marginBottom: 16 }}>
+            This is a themed modal. Tap outside or press below to close.
+          </Text>
+          <Button title="Close" onPress={() => setModalVisible(false)} />
+        </Modal>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

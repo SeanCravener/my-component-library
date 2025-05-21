@@ -2,54 +2,48 @@ import React from "react";
 import {
   Text as RNText,
   TextProps as RNTextProps,
-  StyleSheet,
+  StyleProp,
+  TextStyle,
 } from "react-native";
 import { useTheme } from "../../../hooks/useTheme";
 
-interface TextProps extends RNTextProps {
-  variant?: "h1" | "h2" | "h3" | "body" | "caption";
-  color?: "primary" | "secondary" | "tertiary";
+type Variant = keyof ReturnType<
+  typeof useTheme
+>["theme"]["typography"]["fontSize"];
+type ColorKey = keyof ReturnType<typeof useTheme>["theme"]["colors"];
+type FontWeight = keyof ReturnType<
+  typeof useTheme
+>["theme"]["typography"]["fontFamily"];
+
+interface CustomTextProps extends RNTextProps {
+  variant?: Variant;
+  color?: ColorKey;
+  fontWeight?: FontWeight;
+  align?: TextStyle["textAlign"];
+  style?: StyleProp<TextStyle>;
 }
 
-export const Text: React.FC<TextProps> = ({
+export const Text: React.FC<CustomTextProps> = ({
   children,
   variant = "body",
-  color = "primary",
+  color = "onBackground",
+  fontWeight = "regular",
+  align = "left",
   style,
-  ...props
+  ...rest
 }) => {
   const { theme } = useTheme();
 
-  const styles = StyleSheet.create({
-    h1: {
-      fontSize: theme.typography.fontSize.xxl,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text[color],
-    },
-    h2: {
-      fontSize: theme.typography.fontSize.xl,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text[color],
-    },
-    h3: {
-      fontSize: theme.typography.fontSize.lg,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text[color],
-    },
-    body: {
-      fontSize: theme.typography.fontSize.md,
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text[color],
-    },
-    caption: {
-      fontSize: theme.typography.fontSize.sm,
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text[color],
-    },
-  });
+  const textStyle: TextStyle = {
+    fontSize: theme.typography.fontSize[variant],
+    fontFamily: theme.typography.fontFamily[fontWeight],
+    color: theme.colors[color],
+    textAlign: align,
+    lineHeight: theme.typography.lineHeight.normal,
+  };
 
   return (
-    <RNText style={[styles[variant], style]} {...props}>
+    <RNText style={[textStyle, style]} {...rest}>
       {children}
     </RNText>
   );

@@ -1,85 +1,81 @@
 import React from "react";
 import {
-  StyleSheet,
+  StyleProp,
   TextInput,
   TextInputProps,
-  TouchableOpacity,
-  View,
+  TextStyle,
   ViewStyle,
 } from "react-native";
 import { useTheme } from "../../../hooks/useTheme";
-import { Text } from "../index";
+import { Text, View } from "../index";
+
+type Variant = "filled" | "outlined";
+type ColorKey = keyof ReturnType<typeof useTheme>["theme"]["colors"];
+type RadiusKey = keyof ReturnType<typeof useTheme>["theme"]["borderRadius"];
 
 interface InputProps extends TextInputProps {
   label?: string;
-  error?: string;
-  rightElement?: React.ReactNode;
-  containerStyle?: ViewStyle;
+  variant?: Variant;
+  color?: ColorKey;
+  radius?: RadiusKey;
+  disabled?: boolean;
+  containerStyle?: StyleProp<ViewStyle>;
+  inputStyle?: StyleProp<TextStyle>;
 }
 
 export const Input: React.FC<InputProps> = ({
   label,
-  error,
-  rightElement,
+  variant = "filled",
+  color = "primary",
+  radius = "md",
+  disabled = false,
   containerStyle,
-  style,
-  ...props
+  inputStyle,
+  ...rest
 }) => {
   const { theme } = useTheme();
 
-  const styles = StyleSheet.create({
-    container: {
-      marginBottom: theme.spacing.md,
-    },
-    label: {
-      marginBottom: theme.spacing.xs,
-    },
-    inputContainer: {
-      flexDirection: "row",
-      borderWidth: 1,
-      borderColor: error ? theme.colors.danger : theme.colors.border,
-      borderRadius: theme.borderRadius.md,
-      backgroundColor: theme.colors.surface,
-    },
-    input: {
-      flex: 1,
-      padding: theme.spacing.sm,
-      color: theme.colors.text.primary,
-      fontSize: theme.typography.fontSize.md,
-    },
-    rightElement: {
-      justifyContent: "center",
-      paddingRight: theme.spacing.sm,
-    },
-    error: {
-      marginTop: theme.spacing.xs,
-    },
-  });
+  const backgroundColor =
+    variant === "filled" ? theme.colors.surfaceContainerLow : "transparent";
+
+  const borderColor =
+    variant === "outlined" ? theme.colors[color] : "transparent";
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={containerStyle}>
       {label && (
-        <Text variant="caption" color="secondary" style={styles.label}>
+        <Text
+          variant="label"
+          fontWeight="medium"
+          color="onSurface"
+          style={{ marginBottom: theme.spacing.xs }}
+        >
           {label}
         </Text>
       )}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, style]}
-          placeholderTextColor={theme.colors.text.secondary}
-          {...props}
-        />
-        {rightElement && (
-          <TouchableOpacity style={styles.rightElement}>
-            {rightElement}
-          </TouchableOpacity>
-        )}
-      </View>
-      {error && (
-        <Text variant="caption" style={styles.error}>
-          {error}
-        </Text>
-      )}
+
+      <TextInput
+        placeholderTextColor={theme.colors.outline}
+        editable={!disabled}
+        style={[
+          {
+            backgroundColor: disabled
+              ? theme.colors.surfaceVariant
+              : backgroundColor,
+            borderWidth: variant === "outlined" ? 1 : 0,
+            borderColor,
+            borderRadius: theme.borderRadius[radius],
+            paddingVertical: theme.spacing.sm,
+            paddingHorizontal: theme.spacing.md,
+            fontSize: theme.typography.fontSize.body,
+            fontFamily: theme.typography.fontFamily.regular,
+            color: theme.colors.onSurface,
+            opacity: disabled ? theme.opacity.disabled : 1,
+          },
+          inputStyle,
+        ]}
+        {...rest}
+      />
     </View>
   );
 };

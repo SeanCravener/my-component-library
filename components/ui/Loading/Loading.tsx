@@ -1,44 +1,44 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, View, ViewProps } from "react-native";
+import { ActivityIndicator, StyleProp, ViewStyle } from "react-native";
 import { useTheme } from "../../../hooks/useTheme";
-import { Text } from "../index";
+import { View } from "../index";
 
-interface LoadingProps extends ViewProps {
-  text?: string;
-  fullscreen?: boolean;
+type ColorKey = keyof ReturnType<typeof useTheme>["theme"]["colors"];
+
+interface LoadingProps {
+  color?: ColorKey;
+  size?: number | "small" | "large";
+  fullScreen?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const Loading: React.FC<LoadingProps> = ({
-  text,
-  fullscreen = false,
+  color = "primary",
+  size = "large",
+  fullScreen = false,
   style,
-  ...props
 }) => {
   const { theme } = useTheme();
 
-  const styles = StyleSheet.create({
-    container: {
-      padding: theme.spacing.md,
-      alignItems: "center",
-      justifyContent: "center",
-      ...(fullscreen && {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: theme.colors.background,
-      }),
-    },
-    text: {
-      marginTop: theme.spacing.sm,
-    },
-  });
+  if (fullScreen) {
+    return (
+      <View
+        backgroundColor="background"
+        style={[
+          {
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          },
+          style,
+        ]}
+      >
+        <ActivityIndicator size={size} color={theme.colors[color]} />
+      </View>
+    );
+  }
 
   return (
-    <View style={[styles.container, style]} {...props}>
-      <ActivityIndicator size="large" color={theme.colors.primary} />
-      {text && (
-        <Text variant="body" color="secondary" style={styles.text}>
-          {text}
-        </Text>
-      )}
-    </View>
+    <ActivityIndicator size={size} color={theme.colors[color]} style={style} />
   );
 };

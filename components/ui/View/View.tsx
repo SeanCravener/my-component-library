@@ -1,43 +1,56 @@
 import React from "react";
-import { View as RNView, ViewProps as RNViewProps } from "react-native";
+import {
+  View as RNView,
+  ViewProps as RNViewProps,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import { useTheme } from "../../../hooks/useTheme";
-import { Theme } from "../../../theme/theme";
 
-interface ViewProps extends RNViewProps {
-  padding?: keyof Theme["spacing"];
-  margin?: keyof Theme["spacing"];
-  backgroundColor?: keyof Theme["colors"];
+type SpacingKey = keyof ReturnType<typeof useTheme>["theme"]["spacing"];
+type ColorKey = keyof ReturnType<typeof useTheme>["theme"]["colors"];
+type RadiusKey = keyof ReturnType<typeof useTheme>["theme"]["borderRadius"];
+type ElevationKey = keyof ReturnType<typeof useTheme>["theme"]["elevation"];
+type ZIndexKey = keyof ReturnType<typeof useTheme>["theme"]["zIndex"];
+type OpacityKey = keyof ReturnType<typeof useTheme>["theme"]["opacity"];
+
+interface CustomViewProps extends RNViewProps {
+  padding?: SpacingKey;
+  margin?: SpacingKey;
+  backgroundColor?: ColorKey;
+  borderRadius?: RadiusKey;
+  elevation?: ElevationKey;
+  zIndex?: ZIndexKey;
+  opacity?: OpacityKey;
+  style?: StyleProp<ViewStyle>;
 }
 
-export const View: React.FC<ViewProps> = ({
-  children,
+export const View: React.FC<CustomViewProps> = ({
   padding,
   margin,
   backgroundColor = "background",
+  borderRadius,
+  elevation = "level0",
+  zIndex = "base",
+  opacity = "full",
   style,
-  ...props
+  children,
+  ...rest
 }) => {
   const { theme } = useTheme();
 
+  const baseStyle: ViewStyle = {
+    ...(padding && { padding: theme.spacing[padding] }),
+    ...(margin && { margin: theme.spacing[margin] }),
+    backgroundColor: theme.colors[backgroundColor],
+    ...(borderRadius && { borderRadius: theme.borderRadius[borderRadius] }),
+    ...(elevation && theme.elevation[elevation]),
+    zIndex: theme.zIndex[zIndex],
+    opacity: theme.opacity[opacity],
+  };
+
   return (
-    <RNView
-      style={[
-        padding && {
-          padding: theme.spacing[padding],
-        },
-        margin && {
-          margin: theme.spacing[margin],
-        },
-        {
-          backgroundColor:
-            typeof theme.colors[backgroundColor] === "string"
-              ? (theme.colors[backgroundColor] as string)
-              : (theme.colors.background as string),
-        },
-        style,
-      ]}
-      {...props}
-    >
+    <RNView style={[baseStyle, style]} {...rest}>
       {children}
     </RNView>
   );

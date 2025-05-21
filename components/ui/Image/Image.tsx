@@ -1,67 +1,42 @@
 import React from "react";
 import {
-  ActivityIndicator,
+  ImageStyle,
   Image as RNImage,
   ImageProps as RNImageProps,
-  StyleSheet,
-  View,
+  StyleProp,
 } from "react-native";
 import { useTheme } from "../../../hooks/useTheme";
 
-interface ImageProps extends RNImageProps {
-  size?: number;
-  rounded?: boolean;
+type RadiusKey = keyof ReturnType<typeof useTheme>["theme"]["borderRadius"];
+type ElevationKey = keyof ReturnType<typeof useTheme>["theme"]["elevation"];
+type ColorKey = keyof ReturnType<typeof useTheme>["theme"]["colors"];
+type OpacityKey = keyof ReturnType<typeof useTheme>["theme"]["opacity"];
+
+interface CustomImageProps extends RNImageProps {
+  radius?: RadiusKey;
+  elevation?: ElevationKey;
+  opacity?: OpacityKey;
+  backgroundColor?: ColorKey;
+  style?: StyleProp<ImageStyle>; // ✅ Fixed type here
 }
 
-export const Image: React.FC<ImageProps> = ({
-  size,
-  rounded,
+export const Image: React.FC<CustomImageProps> = ({
+  radius = "none",
+  elevation = "level0",
+  opacity = "full",
+  backgroundColor = "surfaceContainerLowest",
   style,
-  ...props
+  ...rest
 }) => {
   const { theme } = useTheme();
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(false);
 
-  const styles = StyleSheet.create({
-    container: {
-      overflow: "hidden",
-      ...(size && {
-        width: size,
-        height: size,
-      }),
-      ...(rounded && {
-        borderRadius: size ? size / 2 : theme.borderRadius.round,
-      }),
-    },
-    image: {
-      width: "100%",
-      height: "100%",
-    },
-    loadingContainer: {
-      ...StyleSheet.absoluteFillObject,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: theme.colors.surface,
-    },
-  });
+  const themedStyle: ImageStyle = {
+    borderRadius: theme.borderRadius[radius],
+    backgroundColor: theme.colors[backgroundColor],
+    opacity: theme.opacity[opacity],
+    ...theme.elevation[elevation],
+    overflow: "hidden",
+  };
 
-  return (
-    <View style={[styles.container, style]}>
-      <RNImage
-        {...props}
-        style={styles.image}
-        onLoad={() => setLoading(false)}
-        onError={() => {
-          setError(true);
-          setLoading(false);
-        }}
-      />
-      {loading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator color={theme.colors.primary} />
-        </View>
-      )}
-    </View>
-  );
+  return <RNImage style={[themedStyle, style]} {...rest} />;
 };

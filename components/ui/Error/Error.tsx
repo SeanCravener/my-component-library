@@ -1,45 +1,43 @@
 import React from "react";
-import { StyleSheet, View, ViewProps } from "react-native";
+import { StyleProp, TextStyle, ViewStyle } from "react-native";
 import { useTheme } from "../../../hooks/useTheme";
-import { Button, Text } from "../index";
+import { Text, View } from "../index";
 
-interface ErrorProps extends ViewProps {
+interface ErrorProps {
   title?: string;
-  message?: string;
-  onRetry?: () => void;
+  message: string;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
 }
 
 export const Error: React.FC<ErrorProps> = ({
-  title = "Error",
-  message = "Something went wrong",
-  onRetry,
+  title,
+  message,
   style,
-  ...props
+  textStyle,
 }) => {
   const { theme } = useTheme();
 
-  const styles = StyleSheet.create({
-    container: {
-      padding: theme.spacing.md,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    message: {
-      marginTop: theme.spacing.sm,
-      marginBottom: theme.spacing.md,
-      textAlign: "center",
-    },
-  });
-
   return (
-    <View style={[styles.container, style]} {...props}>
-      <Text variant="h2" color="primary">
-        {title}
-      </Text>
-      <Text variant="body" color="secondary" style={styles.message}>
+    <View
+      backgroundColor="errorContainer"
+      padding="md"
+      borderRadius="md" // ✅ Changed here
+      style={style}
+    >
+      {title && (
+        <Text
+          variant="title"
+          fontWeight="bold"
+          color="onErrorContainer"
+          style={{ marginBottom: theme.spacing.xs }}
+        >
+          {title}
+        </Text>
+      )}
+      <Text variant="body" color="onErrorContainer" style={textStyle}>
         {message}
       </Text>
-      {onRetry && <Button title="Retry" onPress={onRetry} />}
     </View>
   );
 };
