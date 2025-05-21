@@ -10,6 +10,7 @@ interface BaseIconProps {
   size?: number;
   color?: ColorKey;
   style?: StyleProp<TextStyle>;
+  onPress?: () => void;
 }
 
 interface FeatherIconProps extends BaseIconProps {
@@ -29,6 +30,7 @@ export const Icon: React.FC<IconProps> = ({
   size = 24,
   color = "onSurface",
   style,
+  onPress,
   Component,
 }) => {
   const { theme } = useTheme();

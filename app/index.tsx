@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SearchBar } from "../components/composite/SearchBar/SearchBar";
 import {
   Avatar,
   Badge,
@@ -26,6 +27,7 @@ export default function ExampleScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -125,6 +127,18 @@ export default function ExampleScreen() {
               onChange={setTermsAccepted}
               label="Accept Terms & Conditions"
               color="tertiary"
+            />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Search Bar
+            </Text>
+            <SearchBar
+              placeholder="Search users..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSearch={(q) => console.log("Search:", q)}
             />
           </Card>
         </View>
