@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { SearchBar } from "../components/composite/SearchBar/SearchBar";
+import {
+  FavoriteButton,
+  RatingDisplay,
+  RatingModal,
+  SearchBar,
+  StepProgressBar,
+  SummaryCardList,
+  SummaryCardRectangle,
+  SummaryCardSquare,
+} from "../components/composite";
 import {
   Avatar,
   Badge,
@@ -20,7 +29,47 @@ import {
   View,
 } from "../components/ui";
 
+const sampleImage2 = require("../assets/images/react-logo.png");
 const reactLogo = require("../assets/images/react-logo.png");
+
+const articles = [
+  {
+    id: "1",
+    title: "Fluffy Cloud Slime",
+    rating: 4.5,
+    tags: ["Fluffy", "Scented"],
+    image: require("../assets/images/react-logo.png"),
+    author: {
+      name: "Luna Sparks",
+      avatarLabel: "LS",
+    },
+    isFavorite: true,
+  },
+  {
+    id: "2",
+    title: "Glow-in-the-Dark Slime",
+    rating: 3.8,
+    tags: ["Glowing"],
+    image: require("../assets/images/react-logo.png"),
+    author: {
+      name: "Max Glo",
+      avatarLabel: "MG",
+    },
+    isFavorite: false,
+  },
+  {
+    id: "3",
+    title: "Butter Slime Deluxe",
+    rating: 4.9,
+    tags: ["Butter", "Stretchy"],
+    image: require("../assets/images/react-logo.png"),
+    author: {
+      name: "Ava Butter",
+      avatarLabel: "AB",
+    },
+    isFavorite: false,
+  },
+];
 
 export default function ExampleScreen() {
   const [inputValue, setInputValue] = useState("");
@@ -28,6 +77,9 @@ export default function ExampleScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorite, setFavorite] = useState(true);
+  const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [rating, setRating] = useState(0);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -141,7 +193,108 @@ export default function ExampleScreen() {
               onSearch={(q) => console.log("Search:", q)}
             />
           </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Favorite Button
+            </Text>
+            <FavoriteButton
+              isFavorite={favorite}
+              onToggle={setFavorite}
+              color="error"
+              size={28}
+            />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Rating Display
+            </Text>
+
+            <View style={{ marginBottom: 12 }}>
+              <RatingDisplay value={3} displayType="full" />
+            </View>
+
+            <View>
+              <RatingDisplay value={4.2} displayType="compact" />
+            </View>
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <Text variant="title" fontWeight="bold" style={{ marginBottom: 8 }}>
+              Interactive Rating Modal
+            </Text>
+            <Button
+              title="Rate Now"
+              onPress={() => setRatingModalVisible(true)}
+            />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <SummaryCardSquare
+              title="Basic Fluffy Slime Recipe"
+              rating={4.8}
+              tags={["Fluffy"]}
+              image={sampleImage2}
+              author={{ name: "Alice Fala", avatarLabel: "AF" }}
+              isFavorite={true}
+              onToggleFavorite={(val) => console.log("Favorite:", val)}
+              onPress={() => console.log("Navigating to detail screen")}
+            />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <SummaryCardRectangle
+              title="Scented Slime With Essential Oils"
+              rating={4.7}
+              tags={["Scented", "Oil-based"]}
+              image={sampleImage2}
+              author={{ name: "Jamie Doe", avatarLabel: "JD" }}
+              isFavorite={false}
+              onToggleFavorite={(val) => console.log("Favorite:", val)}
+              onPress={() => console.log("Navigate to details screen")}
+            />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <SummaryCardList
+              data={articles}
+              layout="rectangle"
+              onPressCard={(item) => console.log("Open:", item.title)}
+              onToggleFavorite={(item, val) =>
+                console.log("Favorite:", item.id, val)
+              }
+              onEndReached={() => console.log("Load more...")}
+              loadingMore={true}
+            />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <SummaryCardList
+              data={articles}
+              layout="square"
+              horizontal
+              onPressCard={(item) => console.log("Tapped:", item.title)}
+              onToggleFavorite={(item, val) =>
+                console.log("Heart changed:", item.title, val)
+              }
+            />
+          </Card>
+
+          <Card style={{ marginBottom: 24 }}>
+            <StepProgressBar currentStep={3} totalSteps={6} />
+          </Card>
         </View>
+
+        <RatingModal
+          visible={ratingModalVisible}
+          onClose={() => setRatingModalVisible(false)}
+          onSubmit={(value) => {
+            setRating(value); // Save user's rating
+            console.log("Rated:", value);
+          }}
+          initialRating={rating}
+        />
 
         <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
           <Text variant="title" fontWeight="bold" style={{ marginBottom: 12 }}>
